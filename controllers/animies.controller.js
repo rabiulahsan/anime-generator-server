@@ -10,11 +10,23 @@ const getAnimies = async (req, res) => {
   res.send(result);
 };
 
+//generate iamges and post it to database
 const generateAnimies = async (req, res) => {
-  const { prompt, email, category, type } = req?.body;
+  const { prompt, email } = req?.body;
   const buffer = await getImageData(prompt);
   const imageData = await getImageUrl(buffer, prompt);
-  res.send(imageData);
+
+  const data = {
+    title: imageData?.data.title,
+    prompt: prompt,
+    email,
+    thumb: imageData?.data?.thumb?.url,
+    image_url: imageData?.data?.url,
+    medium_url: imageData?.data.medium?.url,
+  };
+
+  const result = await animiesCollection.insertOne(data);
+  res.send(result);
 };
 
 module.exports = { getAnimies, generateAnimies };

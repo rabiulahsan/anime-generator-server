@@ -7,6 +7,7 @@ const {
 const router = express.Router();
 
 router.get("/", getAnimies);
+router.get("/users");
 router.post("/generate", generateAnimies);
 
 module.exports = router;
