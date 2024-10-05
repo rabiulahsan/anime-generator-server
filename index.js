@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 const { run } = require("./utils/dbconnection");
 const userRoutes = require("./routes/users.route");
+const animeRoutes = require("./routes/animies.route");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 
@@ -14,6 +15,7 @@ run();
 
 //routes
 app.use("/users", userRoutes);
+app.use("/animies", animeRoutes);
 
 //test
 app.get("/", (req, res) => {
