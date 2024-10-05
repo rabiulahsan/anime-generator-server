@@ -1,9 +1,12 @@
 const express = require("express");
-const { getAnimies } = require("../controllers/animies.controller");
+const {
+  getAnimies,
+  generateAnimies,
+} = require("../controllers/animies.controller");
 
 const router = express.Router();
 
 router.get("/", getAnimies);
-router.post("/generate");
+router.post("/generate", generateAnimies);
 
 module.exports = router;
