@@ -1,5 +1,5 @@
 const getImageData = async (prompt) => {
-  const modifiedPrompt = `Create a realistic anime image based on: ${prompt}`;
+  const modifiedPrompt = `Create a realistic anime image based on: """ ${prompt}"""`;
   const form = new FormData();
   form.append("prompt", modifiedPrompt);
 
