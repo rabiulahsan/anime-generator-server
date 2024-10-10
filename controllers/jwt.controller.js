@@ -1,4 +1,5 @@
 //create api for JWT token
+const jwt = require("jsonwebtoken");
 const postJwtToken = (req, res) => {
   const user = req.body;
   const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
