@@ -5,12 +5,13 @@ const {
   getUsersAnimies,
   getGeneratedAnime,
 } = require("../controllers/animies.controller");
+const verifyJWT = require("../utils/verifyJWT");
 
 const router = express.Router();
 
 router.get("/", getAnimies);
-router.get("/users", getUsersAnimies);
-router.post("/generate", generateAnimies);
-router.get("/generated/:id", getGeneratedAnime);
+router.get("/users", verifyJWT, getUsersAnimies);
+router.post("/generate", verifyJWT, generateAnimies);
+router.get("/generated/:id", verifyJWT, getGeneratedAnime);
 
 module.exports = router;

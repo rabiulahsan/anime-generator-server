@@ -17,13 +17,18 @@ app.use(express.json());
 run();
 
 //routes
-app.use("/users", verifyJWT, userRoutes);
+app.use("/users", userRoutes);
 app.use("/animies", animeRoutes);
 app.use("/jwt", jwtRoutes);
 
 //test
 app.get("/", (req, res) => {
   res.send("Running");
+});
+
+// Protected route
+app.get("/protected", verifyJWT, (req, res) => {
+  res.send({ message: "You have access to this protected route." });
 });
 
 app.listen(port, () => {

@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+
 //create  verifyJWT function
 const verifyJWT = (req, res, next) => {
   // console.log(req.headers);
