@@ -4,7 +4,6 @@ const cors = require("cors");
 const { run } = require("./utils/dbconnection");
 const userRoutes = require("./routes/users.route");
 const animeRoutes = require("./routes/animies.route");
-const imageInhancersRoutes = require("./routes/imageInhancers.route");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 
@@ -17,7 +16,6 @@ run();
 //routes
 app.use("/users", userRoutes);
 app.use("/animies", animeRoutes);
-app.use("/images/api", imageInhancersRoutes);
 
 //test
 app.get("/", (req, res) => {
