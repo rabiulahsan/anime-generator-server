@@ -12,7 +12,7 @@ const getUsers = async (req, res) => {
 const getSingleUser = async (req, res) => {
   const email = req.params.email; // Get email from request parameters
   const query = { email: email }; // Create query object
-
+  console.log(query);
   try {
     const user = await usersCollection.findOne(query); // Find user by email
     if (user) {
@@ -56,4 +56,56 @@ const postUser = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, getSingleUser, postUser };
+//update a user
+const updateUser = async (req, res) => {
+  const userEmail = req.query.email; // Only email is required
+  const userDetails = req.body;
+
+  // Check if email is provided
+  if (!userEmail) {
+    return res.status(400).send({ error: true, message: "Email is required" });
+  }
+
+  //todo Check if the decoded email matches the email from the query
+  // const decodedEmail = req.decoded.email;
+
+  // if (userEmail !== decodedEmail) {
+  //   return res.status(403).send({ error: true, message: "Forbidden access" });
+  // }
+
+  // Use the email to filter the user for updating
+  const filter = { email: userEmail };
+  const options = { upsert: true }; // Optional: Create new record if not found
+  const updatedUserDetails = {
+    $set: {
+      ...userDetails,
+    },
+  };
+
+  try {
+    // Perform the update and then fetch the updated user
+    const result = await usersCollection.updateOne(
+      filter,
+      updatedUserDetails,
+      options
+    );
+
+    // If no documents were modified, the user might not exist (unless it's upserted)
+    if (result.matchedCount === 0 && !options.upsert) {
+      return res.status(404).send({ error: true, message: "User not found" });
+    }
+
+    // Fetch the updated user after updating
+    const updatedUser = await usersCollection.findOne(filter);
+
+    // Send back the updated user details
+    return res.status(200).send(updatedUser);
+  } catch (error) {
+    // Handle any errors that occur during update or fetching
+    return res
+      .status(500)
+      .send({ error: true, message: "An error occurred during update" });
+  }
+};
+
+module.exports = { getUsers, getSingleUser, postUser, updateUser };
