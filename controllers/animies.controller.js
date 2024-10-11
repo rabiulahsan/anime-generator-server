@@ -7,7 +7,7 @@ const animiesCollection = db.collection("animies");
 
 //get all animies
 const getAnimies = async (req, res) => {
-  const result = await animiesCollection.find().toArray();
+  const result = await animiesCollection.find().sort({ _id: -1 }).toArray();
   res.send(result);
 };
 
@@ -22,7 +22,10 @@ const getUsersAnimies = async (req, res) => {
   }
 
   try {
-    const result = await animiesCollection.find({ email }).toArray(); // Query images based on email
+    const result = await animiesCollection
+      .find({ email })
+      .sort({ _id: -1 })
+      .toArray(); // Query images based on email
     res.send(result);
   } catch (error) {
     console.error("Error retrieving anime images:", error);
