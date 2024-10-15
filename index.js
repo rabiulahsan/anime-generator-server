@@ -7,6 +7,9 @@ const animeRoutes = require("./routes/animies.route");
 const jwtRoutes = require("./routes/jwt.route");
 const verifyJWT = require("./utils/verifyJWT");
 const stripe = require("stripe")(process.env.Stripe_Key);
+const { db } = require("./utils/dbconnection");
+
+const paymentsCollection = db.collection("payments");
 
 require("dotenv").config();
 const port = process.env.PORT || 5000;
@@ -29,7 +32,7 @@ app.get("/", (req, res) => {
 
 app.post("/create-payment-intent", async (req, res) => {
   const { price } = req.body;
-
+  console.log(price);
   // Create a PaymentIntent with the order amount and currency
   const paymentIntent = await stripe.paymentIntents.create({
     amount: parseInt(price * 100),
@@ -40,6 +43,33 @@ app.post("/create-payment-intent", async (req, res) => {
   res.send({
     clientSecret: paymentIntent.client_secret,
   });
+});
+
+app.post("/payments", async (req, res) => {
+  const paymentDetails = req.body;
+
+  //todo Check if the decoded email matches the email from the query
+  // const decodedEmail = req.decoded.email;
+
+  // if (userEmail !== decodedEmail) {
+  //   return res.status(403).send({ error: true, message: "Forbidden access" });
+  // }
+
+  // insert new payment
+  try {
+    // Insert new payment into the collection
+    const result = await paymentsCollection.insertOne(paymentDetails);
+
+    // Send a success response
+    res.status(201).send({
+      message: "Payment added to the database",
+      result: result,
+    });
+  } catch (error) {
+    // Handle any errors that may occur
+    console.error("Error inserting payment:", error);
+    res.status(500).send({ error: true, message: "Failed to process payment" });
+  }
 });
 
 // Protected route
