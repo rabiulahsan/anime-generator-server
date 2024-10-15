@@ -72,6 +72,27 @@ app.post("/payments", async (req, res) => {
   }
 });
 
+app.get("/payments", async (req, res) => {
+  const { email } = req.query; // Extract the email from query parameters
+
+  if (!email) {
+    return res
+      .status(400)
+      .send({ message: "Email query parameter is required" });
+  }
+
+  try {
+    const result = await paymentsCollection
+      .find({ email })
+      .sort({ _id: -1 })
+      .toArray(); // Query images based on email
+    res.send(result);
+  } catch (error) {
+    console.error("Error retrieving payments:", error);
+    res.status(500).send({ message: "Error retrieving payments" });
+  }
+});
+
 // Protected route
 app.get("/protected", verifyJWT, (req, res) => {
   res.send({ message: "You have access to this protected route." });
