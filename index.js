@@ -5,11 +5,11 @@ const { run } = require("./utils/dbconnection");
 const userRoutes = require("./routes/users.route");
 const animeRoutes = require("./routes/animies.route");
 const jwtRoutes = require("./routes/jwt.route");
-const verifyJWT = require("./utils/verifyJWT");
 const stripe = require("stripe")(process.env.Stripe_Key);
 const { db } = require("./utils/dbconnection");
-
+const verifyJWT = require("./utils/verifyJWT");
 const paymentsCollection = db.collection("payments");
+const animiesCollection = db.collection("animies");
 
 require("dotenv").config();
 const port = process.env.PORT || 5000;
@@ -45,15 +45,15 @@ app.post("/create-payment-intent", async (req, res) => {
   });
 });
 
-app.post("/payments", async (req, res) => {
+app.post("/payments", verifyJWT, async (req, res) => {
   const paymentDetails = req.body;
+  console.log(req.body);
 
   //todo Check if the decoded email matches the email from the query
-  // const decodedEmail = req.decoded.email;
-
-  // if (userEmail !== decodedEmail) {
-  //   return res.status(403).send({ error: true, message: "Forbidden access" });
-  // }
+  const decodedEmail = req.decoded.email;
+  if (paymentDetails.email !== decodedEmail) {
+    return res.status(403).send({ error: true, message: "Forbidden access" });
+  }
 
   // insert new payment
   try {
@@ -72,13 +72,19 @@ app.post("/payments", async (req, res) => {
   }
 });
 
-app.get("/payments", async (req, res) => {
+app.get("/payments", verifyJWT, async (req, res) => {
   const { email } = req.query; // Extract the email from query parameters
 
   if (!email) {
     return res
       .status(400)
       .send({ message: "Email query parameter is required" });
+  }
+
+  // Check if the decoded email matches the email from the query
+  const decodedEmail = req.decoded.email;
+  if (email !== decodedEmail) {
+    return res.status(403).send({ error: true, message: "Forbidden access" });
   }
 
   try {
@@ -91,6 +97,22 @@ app.get("/payments", async (req, res) => {
     console.error("Error retrieving payments:", error);
     res.status(500).send({ message: "Error retrieving payments" });
   }
+});
+
+//searchapi
+app.get("/api/search", async (req, res) => {
+  const searchQuery = req.query.query;
+  console.log(searchQuery);
+
+  if (!searchQuery) {
+    return res.status(400).json({ error: "No search query provided" });
+  }
+  const searchResults = await animiesCollection
+    .find({
+      prompt: { $regex: new RegExp(searchQuery, "i") },
+    })
+    .toArray();
+  res.status(200).send(searchResults);
 });
 
 // Protected route

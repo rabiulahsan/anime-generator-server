@@ -12,7 +12,7 @@ const getUsers = async (req, res) => {
 const getSingleUser = async (req, res) => {
   const email = req.params.email; // Get email from request parameters
   const query = { email: email }; // Create query object
-  console.log(query);
+  // console.log(query);
   try {
     const user = await usersCollection.findOne(query); // Find user by email
     if (user) {
