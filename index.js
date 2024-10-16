@@ -107,9 +107,14 @@ app.get("/api/search", async (req, res) => {
   if (!searchQuery) {
     return res.status(400).json({ error: "No search query provided" });
   }
+
+  const searchRegex = new RegExp(
+    searchQuery + "(s?|ing|er|r|es|ies)",
+    "i" // Case-insensitive flag
+  );
   const searchResults = await animiesCollection
     .find({
-      prompt: { $regex: new RegExp(searchQuery, "i") },
+      prompt: { $regex: new RegExp(searchRegex) },
     })
     .toArray();
   res.status(200).send(searchResults);
